@@ -34,7 +34,7 @@
         if (a.dataset.browse || /^(#|javascript:)/.test(a.getAttribute("href"))) return;
         const u = new URL(a.href, location.href);
         if (u.protocol === location.protocol && u.host === location.host &&
-            /\/(index|chapter|reader|images)\.html$/.test(u.pathname)) {
+            /\/(index|chapter|reader|images|timeline)\.html$/.test(u.pathname)) {
           u.searchParams.set("mode", "local");
           if (a.href !== u.href) a.href = u.href;
         }
@@ -46,15 +46,24 @@
   }
   const data = window.SHOWCASE_DEMO, m = data.manifest;
   document.body.classList.add("browse-mode");
-  nav.innerHTML = '<a href="index.html">書架</a><a href="images.html">圖片庫</a><button class="btn" onclick="BY.connect()">連接本地企劃</button><button class="btn" onclick="BY.reconnect()">恢復上次企劃</button>';
+  nav.innerHTML = '<a href="index.html">書架</a><a href="timeline.html">時間線</a><a href="images.html">圖片庫</a><button class="btn" onclick="BY.connect()">連接本地企劃</button><button class="btn" onclick="BY.reconnect()">恢復上次企劃</button>';
   qsa(".dialog").forEach((el) => el.remove());
   applyColors(m);
   setStatus("目前為唯讀示例；若要整理自己的作品，請連接本地企劃。");
   renderSidebar({ manifest: m });
   qsa(".sideops,.sideadd").forEach((el) => el.remove());
-  qs("#bySidebar .sidebrand small").textContent = "ver1.3 · 純瀏覽";
+  qs("#bySidebar .sidebrand small").textContent = "ver1.4 · 純瀏覽";
   const chapterURL = (c) => "chapter.html?id=" + encodeURIComponent(c.id);
   const readerURL = (path) => "reader.html?file=" + encodeURIComponent(path);
+  const resolveDocumentPath = (source, target) => {
+    const parts = pathJoin(dirname(source), target).split("/"), out = [];
+    for (const part of parts) {
+      if (!part || part === ".") continue;
+      if (part === "..") out.pop();
+      else out.push(part);
+    }
+    return out.join("/");
+  };
   const imagePath = (c, role) =>
     Object.entries(m.imageMeta).find(
       ([p, meta]) =>
@@ -163,6 +172,11 @@
     const body = WBMarkdown.body(md);
     qs("#readerTitle").textContent = body.match(/^#\s+(.+)$/m)?.[1] || basename(path);
     qs("#md").innerHTML = marked.parse(body);
+    qsa("img[src]", qs("#md")).forEach((image) => {
+      const src = image.getAttribute("src") || "";
+      if (!/^(?:[a-z]+:|\/|#)/i.test(src))
+        image.src = resolveDocumentPath(path, src);
+    });
     if (chapter) banner(chapter, qs(".hero"));
     WBReader.mount(qs("#md"), params);
   };

@@ -2,8 +2,8 @@
    Safety-first layer on top of Folder Mode V10.
 */
 (function () {
-  const WB_VERSION = "1.4.1";
-  const SCHEMA_VERSION = 11;
+  const WB_VERSION = "1.4.0";
+  const SCHEMA_VERSION = 12;
   const native = { initHome: BY.initHome };
   const safeDeleteHandlers = {};
   window.SafeDelete = safeDeleteHandlers;
@@ -48,11 +48,15 @@
   async function ensureSchema() {
     const p = await getProject(true);
     if (!p?.manifest) return;
-    p.manifest.schemaVersion ||= SCHEMA_VERSION;
+    p.manifest.schemaVersion = Math.max(
+      Number(p.manifest.schemaVersion) || 0,
+      SCHEMA_VERSION,
+    );
     p.manifest.workbenchVersion = WB_VERSION;
     p.manifest.project ||= {};
-    p.manifest.project.subtitle ||= "ver1.3 · 教學模板";
-    p.manifest.version = "Workbench 1.4.1";
+    p.manifest.project.subtitle ||= "ver1.4 · 教學模板";
+    p.manifest.timeline ||= [];
+    p.manifest.version = "Workbench 1.4.0";
     if (p.manifest.tags && Object.keys(p.manifest.tags).length === 0)
       delete p.manifest.tags;
     await writeManifest(p.root, p.manifest);
@@ -564,7 +568,7 @@
         for (const f of files) {
           const path = pathJoin(r, f.path);
           try {
-            const text = await (await f.handle.getFile()).text();
+            const text = await readText(p.root, path);
             out.push({
               path,
               name: f.name,
@@ -674,6 +678,19 @@
       if (!normalizeThemes(p.manifest).some((t) => t.id === c.theme))
         issues.push("篇章類型不存在：" + c.title);
     }
+    const timelineIds = new Set();
+    for (const event of p.manifest.timeline || []) {
+      if (!event.id) issues.push("時間線事件缺少 ID：" + (event.title || "未命名"));
+      else if (timelineIds.has(event.id)) issues.push("時間線事件 ID 重複：" + event.id);
+      else timelineIds.add(event.id);
+      if (
+        event.chapterId &&
+        !(p.manifest.chapters || []).some((chapter) => chapter.id === event.chapterId)
+      )
+        issues.push("時間線篇章失效：" + (event.title || event.id));
+      if (event.document && !(await existsPath(p.root, event.document)))
+        issues.push(`時間線文檔失效：${event.title || event.id} → ${event.document}`);
+    }
     if (
       p.manifest.audio?.track &&
       !(await existsPath(p.root, p.manifest.audio.track))
@@ -684,7 +701,7 @@
       "項目健康檢查",
       issues.length
         ? `<div class="health warn"><strong>發現 ${issues.length} 項需要檢查</strong>${issues.map((x) => `<div>• ${htmlEscape(x)}</div>`).join("")}</div>`
-        : '<div class="health ok"><strong>✓ 未發現明顯問題</strong><div>說明文件、篇章目錄、圖片記錄、空文件與 Markdown 圖片連結檢查完成。</div></div>',
+        : '<div class="health ok"><strong>✓ 未發現明顯問題</strong><div>說明文件、篇章目錄、圖片記錄、時間線、空文件與 Markdown 圖片連結檢查完成。</div></div>',
     );
   }
   function normalizePath(path) {
@@ -732,6 +749,105 @@
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 3000);
     showToast(`快照完成：${files} 文件 · ${humanBytes(total)}`);
+  }
+
+  async function makeStaticSite() {
+    const p = await getProject();
+    if (!p || !window.JSZip) {
+      alert("JSZip 未加載。");
+      return;
+    }
+    const docs = await collectMarkdown(p),
+      assetCount = Object.keys(p.manifest.imageMeta || {}).length +
+        (p.manifest.chapters || []).filter((chapter) => chapter.audioTrack).length;
+    if (
+      !confirm(
+        `輸出唯讀靜態站？\n\n將打包 ${docs.length} 份 Markdown 與約 ${assetCount} 項已登記素材。上傳到 GitHub Pages 後，包內文字、圖片與音樂都可被訪客取得。請先確認沒有私人筆記或未授權素材。`,
+      )
+    )
+      return;
+    const zip = new JSZip();
+    let files = 0,
+      total = 0;
+    const addFile = async (path, handle) => {
+      const file = await handle.getFile();
+      zip.file(path, file);
+      files++;
+      total += file.size;
+    };
+    const addPath = async (path) => {
+      try {
+        await addFile(path, await getFileHandleByPath(p.root, path));
+      } catch (e) {
+        reportIssue("靜態站缺少程式檔 " + path, e);
+        throw new Error("無法輸出：缺少 " + path);
+      }
+    };
+    const addDirectory = async (dirPath, filter = () => true) => {
+      let rootDir;
+      try {
+        rootDir = await getDir(p.root, dirPath);
+      } catch (e) {
+        if (e.name === "NotFoundError") return;
+        throw e;
+      }
+      async function walk(dir, prefix) {
+        for await (const [name, handle] of dir.entries()) {
+          const path = pathJoin(prefix, name);
+          if (handle.kind === "directory") await walk(handle, path);
+          else if (filter(path)) await addFile(path, handle);
+        }
+      }
+      await walk(rootDir, dirPath);
+    };
+
+    showToast("正在建立唯讀靜態站…");
+    try {
+      for (const path of [
+        "index.html",
+        "chapter.html",
+        "reader.html",
+        "images.html",
+        "timeline.html",
+      ])
+        await addPath(path);
+      await addDirectory("css");
+      await addDirectory("js", (path) => path !== "js/demo-data.js");
+      await addDirectory("assets");
+      await addDirectory("content", (path) => !/\.md$/i.test(path));
+      for (const optional of ["LICENSE", "CONTENT_AND_ASSET_NOTICE.md"])
+        if (await existsPath(p.root, optional)) await addPath(optional);
+
+      const bundle = {
+        manifest: JSON.parse(JSON.stringify(p.manifest)),
+        documents: Object.fromEntries(docs.map((doc) => [doc.path, doc.text])),
+      };
+      const demoData =
+        "// Generated by Workbench ver1.4 static export.\nwindow.SHOWCASE_DEMO = " +
+        JSON.stringify(bundle) +
+        ";\n";
+      zip.file("js/demo-data.js", demoData);
+      zip.file(".nojekyll", "");
+      zip.file(
+        "README_STATIC.md",
+        `# ${p.manifest.project?.title || "小說企劃靜態展示站"}\n\n此資料夾由「本地小說企劃展示與整理臺 ver1.4」輸出。直接開啟 index.html 可瀏覽；亦可把全部檔案上傳到 GitHub Pages。\n\n這是唯讀公開版本，不包含本地編輯、歷史版本與垃圾桶資料。若要修改內容，請回到原始企劃資料夾編輯後重新輸出。\n`,
+      );
+      const blob = await zip.generateAsync({
+        type: "blob",
+        compression: "DEFLATE",
+        compressionOptions: { level: 6 },
+      });
+      const link = document.createElement("a"),
+        safeTitle = "Local_Novel_Project_Showcase";
+      link.href = URL.createObjectURL(blob);
+      link.download = `${safeTitle}_Static_${stamp()}.zip`;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(link.href), 3000);
+      showToast(`靜態站完成：${files + 3} 文件 · ${humanBytes(total + demoData.length)}`);
+    } catch (e) {
+      reportIssue("輸出靜態站", e);
+      alert("靜態站輸出失敗：" + (e.message || e));
+    }
   }
 
   async function trashPanel() {
@@ -830,10 +946,10 @@
     if (window.SHOWCASE_BROWSE || qs("#wbQuickTools")) return;
     document.body.insertAdjacentHTML(
       "beforeend",
-      `<div class="wbquick" id="wbQuickTools"><button title="全局搜尋" onclick="WB.search()">⌕</button><button title="項目快照 ZIP" onclick="WB.backup()">ZIP</button><button title="健康檢查" onclick="WB.health()">✓</button><button title="字數統計" onclick="WB.stats()">字</button><button title="垃圾桶" onclick="WB.trash()">🗑</button></div>`,
+      `<div class="wbquick" id="wbQuickTools"><button title="全局搜尋" onclick="WB.search()">⌕</button><button title="項目快照 ZIP" onclick="WB.backup()">ZIP</button><button title="輸出唯讀靜態站" onclick="WB.exportSite()">SITE</button><button title="健康檢查" onclick="WB.health()">✓</button><button title="字數統計" onclick="WB.stats()">字</button><button title="垃圾桶" onclick="WB.trash()">🗑</button></div>`,
     );
     const sb = qs("#bySidebar .sidebrand small");
-    if (sb) sb.textContent = "ver1.3";
+    if (sb) sb.textContent = "ver1.4";
   }
 
   async function collectShowcaseImages(p, chapterId = "") {
@@ -1093,7 +1209,7 @@
     if (heroCopy && !qs("#wbDashboard"))
       heroCopy.insertAdjacentHTML(
         "beforeend",
-        `<div class="wb-dashboard" id="wbDashboard"><span><b>${docs.length}</b> Markdown</span><span><b>${total.toLocaleString()}</b> 字</span><button class="btn" onclick="WB.search()">全局搜尋</button><button class="btn" onclick="WB.backup()">建立快照</button></div>`,
+        `<div class="wb-dashboard" id="wbDashboard"><span><b>${docs.length}</b> Markdown</span><span><b>${total.toLocaleString()}</b> 字</span><button class="btn" onclick="WB.search()">全局搜尋</button><a class="btn" href="timeline.html">時間線</a><button class="btn" onclick="WB.backup()">建立快照</button><button class="btn" onclick="WB.exportSite()">輸出靜態站</button></div>`,
       );
     const last = localStorage.getItem("NOVEL_DEMO_WB_LAST_URL");
     if (last && last !== location.href) {
@@ -1139,6 +1255,7 @@
     closeModal,
     search: () => openSearch(),
     backup: makeBackup,
+    exportSite: makeStaticSite,
     health: healthCheck,
     stats: showStats,
     trash: trashPanel,

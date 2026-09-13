@@ -1887,3 +1887,107 @@ h2 {
   outline: 1px solid #ffffff35;
   outline-offset: 6px;
 }
+
+/* Workbench 1.4 timeline */
+.timeline-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  margin-top: 20px;
+}
+.timeline-tools label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.timeline-tools select {
+  min-width: 220px;
+  padding: 10px 12px;
+  border: 1px solid #ffffff20;
+  border-radius: 10px;
+  background: #111319;
+  color: var(--text);
+}
+.timeline-list {
+  position: relative;
+  display: grid;
+  gap: 18px;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 6px 0;
+}
+.timeline-list::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 16px;
+  width: 2px;
+  background: linear-gradient(#ffffff10, #ffffff35, #ffffff10);
+}
+.timeline-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 14px;
+}
+.timeline-dot {
+  z-index: 1;
+  width: 13px;
+  height: 13px;
+  margin: 26px 0 0 10px;
+  border: 3px solid #111319;
+  border-radius: 50%;
+  background: var(--accent, #71717a);
+  box-shadow: 0 0 0 2px var(--accent, #71717a), 0 0 20px color-mix(in srgb, var(--accent, #71717a) 50%, transparent);
+}
+.timeline-card {
+  padding: 20px;
+  border: 1px solid #ffffff18;
+  border-left: 3px solid var(--accent, #71717a);
+  border-radius: 16px;
+  background: linear-gradient(135deg, #171920, #101116);
+  box-shadow: 0 14px 36px #00000032;
+}
+.timeline-card h2 {
+  margin: 10px 0 8px;
+  font-size: clamp(19px, 2.2vw, 26px);
+}
+.timeline-card p {
+  margin: 0;
+  color: #d2d2da;
+  line-height: 1.7;
+}
+.timeline-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.timeline-meta span {
+  padding: 4px 8px;
+  border: 1px solid #ffffff17;
+  border-radius: 999px;
+  background: #ffffff09;
+  color: var(--muted);
+  font-size: 12px;
+}
+.timeline-card .actions {
+  margin-top: 14px;
+}
+@media (max-width: 640px) {
+  .timeline-item {
+    grid-template-columns: 26px 1fr;
+    gap: 8px;
+  }
+  .timeline-list::before {
+    left: 11px;
+  }
+  .timeline-dot {
+    margin-left: 5px;
+  }
+  .timeline-card {
+    padding: 16px;
+  }
+}

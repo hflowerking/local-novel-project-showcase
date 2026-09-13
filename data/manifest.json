@@ -1,7 +1,7 @@
 {
   "project": {
     "title": "本地小說企劃展示與整理臺",
-    "subtitle": "ver1.3 · 教學模板"
+    "subtitle": "ver1.4 · 教學模板"
   },
   "colors": {
     "baizi": "#ffffff",
@@ -60,6 +60,74 @@
       "group": "使用說明"
     }
   ],
+  "timeline": [
+    {
+      "id": "xianxia-found-pill",
+      "order": 10,
+      "moment": "第一篇 · 第一日",
+      "title": "發現廢丹恢復藥性",
+      "chapterId": "xianxia",
+      "type": "主線",
+      "status": "已發生",
+      "description": "沈硯在廢丹房發現異常，故事核心問題正式出現。",
+      "document": "content/xianxia/04_Outline.md"
+    },
+    {
+      "id": "xianxia-test-rule",
+      "order": 20,
+      "moment": "第一篇 · 第二日",
+      "title": "驗證丹藥恢復條件",
+      "chapterId": "xianxia",
+      "type": "規則",
+      "status": "待寫",
+      "description": "以不同丹藥測試限制，區分已確認設定與待定項。",
+      "document": "content/xianxia/02_Core.md"
+    },
+    {
+      "id": "infinite-arrival",
+      "order": 30,
+      "moment": "副本 · 00:15",
+      "title": "四人抵達第七碼頭",
+      "chapterId": "infinite",
+      "type": "副本",
+      "status": "已發生",
+      "description": "廣播公布第一批公開規則，隊伍尚未知道其中混有誤導。",
+      "document": "content/infinite/05_Chapter_01.md"
+    },
+    {
+      "id": "infinite-ticket",
+      "order": 40,
+      "moment": "副本 · 02:10",
+      "title": "發現潮汐章船票",
+      "chapterId": "infinite",
+      "type": "線索",
+      "status": "待寫",
+      "description": "真船票首次出現，公開規則與真實條件開始分離。",
+      "document": "content/infinite/04_Clues.md"
+    },
+    {
+      "id": "danmei-reunion",
+      "order": 50,
+      "moment": "上元 · 雨夜",
+      "title": "燈市重逢",
+      "chapterId": "danmei",
+      "type": "感情",
+      "status": "已發生",
+      "description": "謝珩與溫言共撐一傘，恢復最低限度的交談。",
+      "document": "content/danmei/05_Chapter_01.md"
+    },
+    {
+      "id": "danmei-letter",
+      "order": 60,
+      "moment": "重逢後 · 第七日",
+      "title": "舊驛站對證",
+      "chapterId": "danmei",
+      "type": "回收",
+      "status": "待寫",
+      "description": "代簽紀錄揭開舊信去向，誤會解除但選擇尚未完成。",
+      "document": "content/danmei/04_Events.md"
+    }
+  ],
   "imageMeta": {
     "assets/images/xianxia/cover.webp": {
       "role": "cover",
@@ -98,8 +166,8 @@
     "volume": 0.35,
     "loop": true
   },
-  "version": "Workbench 1.4.1",
-  "schemaVersion": 11,
-  "workbenchVersion": "1.4.1",
-  "demoVersion": "ver1.3"
+  "version": "Workbench 1.4.0",
+  "schemaVersion": 12,
+  "workbenchVersion": "1.4.0",
+  "demoVersion": "ver1.4"
 }

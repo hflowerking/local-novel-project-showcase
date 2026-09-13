@@ -1,6 +1,10 @@
 const DB = "novel-demo-folder-db",
   STORE = "handles",
+  CACHE_STORE = "file-cache",
   KEY = "root";
+const CACHE_DB_VERSION = 2,
+  CACHE_TEXT_LIMIT = 2 * 1024 * 1024;
+const MEMORY_FILE_CACHE = new Map();
 const DEFAULT_COLORS = {
   baizi: "#ffffff",
   unknown: "#050505",
@@ -107,20 +111,82 @@ function extname(path) {
 
 function openDB() {
   return new Promise((res, rej) => {
-    const r = indexedDB.open(DB, 1);
+    const r = indexedDB.open(DB, CACHE_DB_VERSION);
     r.onupgradeneeded = () => {
       if (!r.result.objectStoreNames.contains(STORE))
         r.result.createObjectStore(STORE);
+      if (!r.result.objectStoreNames.contains(CACHE_STORE))
+        r.result.createObjectStore(CACHE_STORE);
     };
     r.onsuccess = () => res(r.result);
     r.onerror = () => rej(r.error);
   });
 }
+function cacheKey(root, path) {
+  return `${root?.name || "project"}::${path}`;
+}
+async function getFileCache(root, path) {
+  const key = cacheKey(root, path);
+  if (MEMORY_FILE_CACHE.has(key)) return MEMORY_FILE_CACHE.get(key);
+  try {
+    const db = await openDB();
+    return await new Promise((res, rej) => {
+      const tx = db.transaction(CACHE_STORE, "readonly"),
+        r = tx.objectStore(CACHE_STORE).get(cacheKey(root, path));
+      r.onsuccess = () => {
+        const value = r.result || null;
+        if (value) MEMORY_FILE_CACHE.set(key, value);
+        res(value);
+      };
+      r.onerror = () => rej(r.error);
+    });
+  } catch (e) {
+    console.warn("讀取快取失敗", e);
+    return null;
+  }
+}
+async function setFileCache(root, path, file, text) {
+  if (file.size > CACHE_TEXT_LIMIT) return;
+  const key = cacheKey(root, path),
+    value = { size: file.size, lastModified: file.lastModified, text };
+  MEMORY_FILE_CACHE.set(key, value);
+  try {
+    const db = await openDB();
+    await new Promise((res, rej) => {
+      const tx = db.transaction(CACHE_STORE, "readwrite");
+      tx.objectStore(CACHE_STORE).put(
+        value,
+        key,
+      );
+      tx.oncomplete = res;
+      tx.onerror = () => rej(tx.error);
+    });
+  } catch (e) {
+    console.warn("寫入快取失敗", e);
+  }
+}
+async function invalidateFileCache(root, path) {
+  const key = cacheKey(root, path);
+  MEMORY_FILE_CACHE.delete(key);
+  try {
+    const db = await openDB();
+    await new Promise((res, rej) => {
+      const tx = db.transaction(CACHE_STORE, "readwrite");
+      tx.objectStore(CACHE_STORE).delete(key);
+      tx.oncomplete = res;
+      tx.onerror = () => rej(tx.error);
+    });
+  } catch (e) {
+    console.warn("清除快取失敗", e);
+  }
+}
 async function setRoot(h) {
   const db = await openDB();
   return new Promise((res, rej) => {
-    const tx = db.transaction(STORE, "readwrite");
+    const tx = db.transaction([STORE, CACHE_STORE], "readwrite");
     tx.objectStore(STORE).put(h, KEY);
+    tx.objectStore(CACHE_STORE).clear();
+    MEMORY_FILE_CACHE.clear();
     tx.oncomplete = res;
     tx.onerror = () => rej(tx.error);
   });
@@ -190,19 +256,35 @@ async function getFileHandleByPath(root, path, create = false) {
 }
 async function readText(root, path) {
   const fh = await getFileHandleByPath(root, path);
-  return await (await fh.getFile()).text();
+  const file = await fh.getFile();
+  if (/\.md$/i.test(path) || path === "data/manifest.json") {
+    const cached = await getFileCache(root, path);
+    if (
+      cached &&
+      cached.size === file.size &&
+      cached.lastModified === file.lastModified
+    )
+      return cached.text;
+    const text = await file.text();
+    await setFileCache(root, path, file, text);
+    return text;
+  }
+  return await file.text();
 }
 async function writeText(root, path, text) {
   const fh = await getFileHandleByPath(root, path, true),
     w = await fh.createWritable();
   await w.write(text);
   await w.close();
+  if (/\.md$/i.test(path) || path === "data/manifest.json")
+    await setFileCache(root, path, await fh.getFile(), text);
 }
 async function writeBlob(root, path, blob) {
   const fh = await getFileHandleByPath(root, path, true),
     w = await fh.createWritable();
   await w.write(blob);
   await w.close();
+  await invalidateFileCache(root, path);
 }
 async function readManifest(root) {
   try {
@@ -229,6 +311,7 @@ async function removePath(root, path, recursive = false) {
     name = parts.pop();
   const parent = await getDir(root, parts.join("/"));
   await parent.removeEntry(name, { recursive });
+  await invalidateFileCache(root, path);
 }
 async function copyFile(root, from, to) {
   const fh = await getFileHandleByPath(root, from);
@@ -590,7 +673,7 @@ function renderSidebar(p) {
   const ch = p.manifest.chapters || [];
   document.body.insertAdjacentHTML(
     "afterbegin",
-    `<aside class="bysidenav" id="bySidebar"><div class="sidebrand"><div class="mark">文</div><div><strong>${esc(p.manifest.project?.title || "本地小說企劃展示與整理臺")}</strong><small>ver1.3 · Local CMS</small></div></div><div class="sidenavscroll"><div class="sidegroup"><div class="sidegrouptitle">使用說明</div>${docs.map((d) => `<div class="sidefile"><a target="_blank" href="reader.html?file=${encodeURIComponent(d.path)}" title="${esc(d.path)}">${esc(compactSeriesLabel(d.title))}</a><span class="sideops"><button title="替換" onclick="BY.replaceSeriesDoc('${encodeURIComponent(d.path)}')">↻</button><button title="刪除" class="danger" onclick="BY.deleteSeriesDoc('${encodeURIComponent(d.path)}')">×</button></span></div>`).join("")}<button class="sideadd" onclick="BY.addSeriesDoc()">＋ 新增說明 MD</button></div><div class="sidegroup"><div class="sidegrouptitle">篇章</div>${ch.map((c) => `<a class="sidelink" href="chapter.html?id=${encodeURIComponent(c.id)}"><span>${esc(c.title)}</span><small>${esc(c.subtitle || "")}</small></a>`).join("")}</div>${supplements.length ? `<details class="sidegroup"><summary class="sidegrouptitle">補充 / Guide</summary>${supplements.map((d) => `<a class="sidelink compact" target="_blank" href="reader.html?file=${encodeURIComponent(d.path)}">${esc(d.title)}</a>`).join("")}</details>` : ""}<div class="sidegroup"><div class="sidegrouptitle">素材</div><a class="sidelink compact" href="images.html">圖片庫</a></div></div><button class="sidecollapse" onclick="BY.toggleSidebar()">‹</button></aside><button class="sideopen" id="sideOpen" onclick="BY.toggleSidebar()">☰</button>`,
+    `<aside class="bysidenav" id="bySidebar"><div class="sidebrand"><div class="mark">文</div><div><strong>${esc(p.manifest.project?.title || "本地小說企劃展示與整理臺")}</strong><small>ver1.4 · Local CMS</small></div></div><div class="sidenavscroll"><div class="sidegroup"><div class="sidegrouptitle">使用說明</div>${docs.map((d) => `<div class="sidefile"><a target="_blank" href="reader.html?file=${encodeURIComponent(d.path)}" title="${esc(d.path)}">${esc(compactSeriesLabel(d.title))}</a><span class="sideops"><button title="替換" onclick="BY.replaceSeriesDoc('${encodeURIComponent(d.path)}')">↻</button><button title="刪除" class="danger" onclick="BY.deleteSeriesDoc('${encodeURIComponent(d.path)}')">×</button></span></div>`).join("")}<button class="sideadd" onclick="BY.addSeriesDoc()">＋ 新增說明 MD</button></div><div class="sidegroup"><div class="sidegrouptitle">企劃視圖</div><a class="sidelink compact" href="timeline.html">事件時間線</a></div><div class="sidegroup"><div class="sidegrouptitle">篇章</div>${ch.map((c) => `<a class="sidelink" href="chapter.html?id=${encodeURIComponent(c.id)}"><span>${esc(c.title)}</span><small>${esc(c.subtitle || "")}</small></a>`).join("")}</div>${supplements.length ? `<details class="sidegroup"><summary class="sidegrouptitle">補充 / Guide</summary>${supplements.map((d) => `<a class="sidelink compact" target="_blank" href="reader.html?file=${encodeURIComponent(d.path)}">${esc(d.title)}</a>`).join("")}</details>` : ""}<div class="sidegroup"><div class="sidegrouptitle">素材</div><a class="sidelink compact" href="images.html">圖片庫</a></div></div><button class="sidecollapse" onclick="BY.toggleSidebar()">‹</button></aside><button class="sideopen" id="sideOpen" onclick="BY.toggleSidebar()">☰</button>`,
   );
 }
 function toggleSidebar() {
@@ -729,7 +812,10 @@ async function renderTreeNodes(ch, items, depth = 0) {
     } else {
       let secHtml = "";
       try {
-        const md = await (await item.handle.getFile()).text();
+        const md = await readText(
+          CURRENT_PROJECT.root,
+          pathJoin(ch.folder, item.path),
+        );
         const secs = WBReader.outline(md);
         if (secs.length)
           secHtml = `<div class="treesections">${secs.map((s) => `<a target="_blank" href="reader.html?file=${encodeURIComponent(pathJoin(ch.folder, item.path))}&anchor=${encodeURIComponent(s.id)}">${esc(s.title)}</a>`).join("")}</div>`;
