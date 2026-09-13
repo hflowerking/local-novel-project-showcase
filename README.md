@@ -5,6 +5,8 @@ Story Workbench
 把你的小說資料夾，變成自己的創作工作臺。
 Markdown、圖片、設定、篇章與 BGM 都留在本地。
 不用安裝，不用帳號，也不用把作品搬進別人的雲端。
+
+市面上的寫作工具要麼把你的作品鎖在雲端，要麼過於複雜。我想要一個簡單、克制、數據完全在自己手上的小說整理工具 —— 於是有了這個工作臺。
 ![畫面預覽](https://github.com/hflowerking/local-novel-project-showcase/blob/main/screenshots/home.png)
 企劃、功能方向與版本整理：百花王 康門  
 程式實作、文件整理與教學示例曾使用 OpenAI ChatGPT／Codex 協助完成，最終內容由百花王 康門選擇、修改與審訂。
