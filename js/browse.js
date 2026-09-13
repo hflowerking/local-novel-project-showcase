@@ -52,7 +52,7 @@
   setStatus("目前為唯讀示例；若要整理自己的作品，請連接本地企劃。");
   renderSidebar({ manifest: m });
   qsa(".sideops,.sideadd").forEach((el) => el.remove());
-  qs("#bySidebar .sidebrand small").textContent = "ver1.2 · 純瀏覽";
+  qs("#bySidebar .sidebrand small").textContent = "ver1.3 · 純瀏覽";
   const chapterURL = (c) => "chapter.html?id=" + encodeURIComponent(c.id);
   const readerURL = (path) => "reader.html?file=" + encodeURIComponent(path);
   const imagePath = (c, role) =>

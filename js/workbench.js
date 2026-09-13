@@ -51,7 +51,7 @@
     p.manifest.schemaVersion ||= SCHEMA_VERSION;
     p.manifest.workbenchVersion = WB_VERSION;
     p.manifest.project ||= {};
-    p.manifest.project.subtitle ||= "ver1.2 · 教學模板 · 百花王 康門 開源";
+    p.manifest.project.subtitle ||= "ver1.3 · 教學模板";
     p.manifest.version = "Workbench 1.4.1";
     if (p.manifest.tags && Object.keys(p.manifest.tags).length === 0)
       delete p.manifest.tags;
@@ -833,7 +833,7 @@
       `<div class="wbquick" id="wbQuickTools"><button title="全局搜尋" onclick="WB.search()">⌕</button><button title="項目快照 ZIP" onclick="WB.backup()">ZIP</button><button title="健康檢查" onclick="WB.health()">✓</button><button title="字數統計" onclick="WB.stats()">字</button><button title="垃圾桶" onclick="WB.trash()">🗑</button></div>`,
     );
     const sb = qs("#bySidebar .sidebrand small");
-    if (sb) sb.textContent = "ver1.2";
+    if (sb) sb.textContent = "ver1.3";
   }
 
   async function collectShowcaseImages(p, chapterId = "") {

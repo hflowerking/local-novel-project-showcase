@@ -1,7 +1,7 @@
 {
   "project": {
     "title": "本地小說企劃展示與整理臺",
-    "subtitle": "ver1.2 · 教學模板 · 百花王 康門 開源"
+    "subtitle": "ver1.3 · 教學模板"
   },
   "colors": {
     "baizi": "#ffffff",
@@ -10,41 +10,13 @@
     "melancholy": "#2563eb"
   },
   "themes": [
-    {
-      "id": "baizi",
-      "label": "中性",
-      "color": "#f4f4f5"
-    },
-    {
-      "id": "unknown",
-      "label": "未知",
-      "color": "#3f3f46"
-    },
-    {
-      "id": "horror",
-      "label": "恐怖懸疑",
-      "color": "#b91c1c"
-    },
-    {
-      "id": "melancholy",
-      "label": "憂鬱",
-      "color": "#2563eb"
-    },
-    {
-      "id": "light",
-      "label": "輕快",
-      "color": "#65a30d"
-    },
-    {
-      "id": "romance",
-      "label": "戀愛",
-      "color": "#db2777"
-    },
-    {
-      "id": "passion",
-      "label": "熱血",
-      "color": "#d97706"
-    }
+    { "id": "baizi", "label": "中性", "color": "#f4f4f5" },
+    { "id": "unknown", "label": "未知", "color": "#3f3f46" },
+    { "id": "horror", "label": "恐怖懸疑", "color": "#b91c1c" },
+    { "id": "melancholy", "label": "憂鬱", "color": "#2563eb" },
+    { "id": "light", "label": "輕快", "color": "#65a30d" },
+    { "id": "romance", "label": "戀愛", "color": "#db2777" },
+    { "id": "passion", "label": "熱血", "color": "#d97706" }
   ],
   "chapters": [
     {
@@ -129,5 +101,5 @@
   "version": "Workbench 1.4.1",
   "schemaVersion": 11,
   "workbenchVersion": "1.4.1",
-  "demoVersion": "ver1.2"
+  "demoVersion": "ver1.3"
 }

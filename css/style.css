@@ -207,6 +207,27 @@ h2 {
 .action:hover {
   background: rgba(255, 255, 255, 0.06);
 }
+.docx-dropzone {
+  display: grid;
+  gap: 5px;
+  margin: 0 0 16px;
+  padding: 15px 18px;
+  border: 1px dashed rgba(255, 255, 255, 0.22);
+  border-radius: 14px;
+  color: #d8dbe1;
+  background: rgba(255, 255, 255, 0.025);
+  transition: 0.18s ease;
+}
+.docx-dropzone span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.docx-dropzone.is-dragging {
+  border-color: var(--accent, #60a5fa);
+  background: rgba(96, 165, 250, 0.1);
+  transform: translateY(-1px);
+}
 .badge {
   display: inline-flex;
   padding: 4px 9px;
@@ -1538,7 +1559,7 @@ h2 {
   }
 }
 
-/* Workbench 1.2 · 首页紧凑 Hero + 中央焦点式视觉展台 */
+/* Workbench 1.3 · 首页紧凑 Hero + 中央焦点式视觉展台 */
 .hero-home {
   display: grid;
   grid-template-columns: minmax(430px, 0.92fr) minmax(420px, 1.08fr);

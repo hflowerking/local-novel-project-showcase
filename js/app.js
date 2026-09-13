@@ -590,7 +590,7 @@ function renderSidebar(p) {
   const ch = p.manifest.chapters || [];
   document.body.insertAdjacentHTML(
     "afterbegin",
-    `<aside class="bysidenav" id="bySidebar"><div class="sidebrand"><div class="mark">文</div><div><strong>${esc(p.manifest.project?.title || "本地小說企劃展示與整理臺")}</strong><small>ver1.2 · Local CMS</small></div></div><div class="sidenavscroll"><div class="sidegroup"><div class="sidegrouptitle">使用說明</div>${docs.map((d) => `<div class="sidefile"><a target="_blank" href="reader.html?file=${encodeURIComponent(d.path)}" title="${esc(d.path)}">${esc(compactSeriesLabel(d.title))}</a><span class="sideops"><button title="替換" onclick="BY.replaceSeriesDoc('${encodeURIComponent(d.path)}')">↻</button><button title="刪除" class="danger" onclick="BY.deleteSeriesDoc('${encodeURIComponent(d.path)}')">×</button></span></div>`).join("")}<button class="sideadd" onclick="BY.addSeriesDoc()">＋ 新增說明 MD</button></div><div class="sidegroup"><div class="sidegrouptitle">篇章</div>${ch.map((c) => `<a class="sidelink" href="chapter.html?id=${encodeURIComponent(c.id)}"><span>${esc(c.title)}</span><small>${esc(c.subtitle || "")}</small></a>`).join("")}</div>${supplements.length ? `<details class="sidegroup"><summary class="sidegrouptitle">補充 / Guide</summary>${supplements.map((d) => `<a class="sidelink compact" target="_blank" href="reader.html?file=${encodeURIComponent(d.path)}">${esc(d.title)}</a>`).join("")}</details>` : ""}<div class="sidegroup"><div class="sidegrouptitle">素材</div><a class="sidelink compact" href="images.html">圖片庫</a></div></div><button class="sidecollapse" onclick="BY.toggleSidebar()">‹</button></aside><button class="sideopen" id="sideOpen" onclick="BY.toggleSidebar()">☰</button>`,
+    `<aside class="bysidenav" id="bySidebar"><div class="sidebrand"><div class="mark">文</div><div><strong>${esc(p.manifest.project?.title || "本地小說企劃展示與整理臺")}</strong><small>ver1.3 · Local CMS</small></div></div><div class="sidenavscroll"><div class="sidegroup"><div class="sidegrouptitle">使用說明</div>${docs.map((d) => `<div class="sidefile"><a target="_blank" href="reader.html?file=${encodeURIComponent(d.path)}" title="${esc(d.path)}">${esc(compactSeriesLabel(d.title))}</a><span class="sideops"><button title="替換" onclick="BY.replaceSeriesDoc('${encodeURIComponent(d.path)}')">↻</button><button title="刪除" class="danger" onclick="BY.deleteSeriesDoc('${encodeURIComponent(d.path)}')">×</button></span></div>`).join("")}<button class="sideadd" onclick="BY.addSeriesDoc()">＋ 新增說明 MD</button></div><div class="sidegroup"><div class="sidegrouptitle">篇章</div>${ch.map((c) => `<a class="sidelink" href="chapter.html?id=${encodeURIComponent(c.id)}"><span>${esc(c.title)}</span><small>${esc(c.subtitle || "")}</small></a>`).join("")}</div>${supplements.length ? `<details class="sidegroup"><summary class="sidegrouptitle">補充 / Guide</summary>${supplements.map((d) => `<a class="sidelink compact" target="_blank" href="reader.html?file=${encodeURIComponent(d.path)}">${esc(d.title)}</a>`).join("")}</details>` : ""}<div class="sidegroup"><div class="sidegrouptitle">素材</div><a class="sidelink compact" href="images.html">圖片庫</a></div></div><button class="sidecollapse" onclick="BY.toggleSidebar()">‹</button></aside><button class="sideopen" id="sideOpen" onclick="BY.toggleSidebar()">☰</button>`,
   );
 }
 function toggleSidebar() {
@@ -715,7 +715,7 @@ async function initHome() {
 
 function folderControls(chId, rel) {
   const e = encodeURIComponent(rel);
-  return `<span class="fileops"><button onclick="BY.newFolder('${chId}','${e}')">＋夾</button><button onclick="BY.newMarkdown('${chId}','${e}')">＋MD</button>${rel ? `<button onclick="BY.renameChapterFolder('${chId}','${e}')">改名</button><button class="danger" onclick="BY.deleteChapterFolder('${chId}','${e}')">刪除</button>` : ""}</span>`;
+  return `<span class="fileops"><button onclick="BY.newFolder('${chId}','${e}')">＋夾</button><button onclick="BY.newMarkdown('${chId}','${e}')">＋MD</button><button onclick="BY.importDocx('${chId}','${e}')" title="把 Word／WPS 的 DOCX 轉成 Markdown">＋DOCX</button>${rel ? `<button onclick="BY.renameChapterFolder('${chId}','${e}')">改名</button><button class="danger" onclick="BY.deleteChapterFolder('${chId}','${e}')">刪除</button>` : ""}</span>`;
 }
 function fileControls(chId, rel) {
   const e = encodeURIComponent(rel);
@@ -775,6 +775,7 @@ async function initChapter() {
   qs("#imagesLink").href = "images.html?chapter=" + encodeURIComponent(c.id);
   const edit = qs("#editChapterBtn");
   if (edit) edit.onclick = () => openChapterSettings(c.id);
+  setupDocxDropZone(c);
   await refreshChapterTree(c);
 }
 function getChapter(id) {
@@ -816,6 +817,100 @@ async function newMarkdown(chId, encodedParent = "") {
   const title = name.replace(/\.md$/i, "");
   await writeText(p.root, full, `# ${title}\n\n（待補）\n`);
   await refreshChapterTree(ch);
+}
+
+function setupDocxDropZone(ch) {
+  const list = qs("#docList");
+  if (!list || qs("#docxDropZone")) return;
+  const zone = document.createElement("div");
+  zone.id = "docxDropZone";
+  zone.className = "docx-dropzone";
+  zone.innerHTML =
+    '<strong>匯入 Word／WPS 文稿</strong><span>把 .docx 拖到這裡，或使用文件夾旁的「＋DOCX」。文件會在本機轉成 Markdown，原始 DOCX 不會被修改。</span>';
+  list.before(zone);
+  zone.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    if (event.dataTransfer) event.dataTransfer.dropEffect = "copy";
+    zone.classList.add("is-dragging");
+  });
+  zone.addEventListener("dragleave", () => zone.classList.remove("is-dragging"));
+  zone.addEventListener("drop", async (event) => {
+    event.preventDefault();
+    zone.classList.remove("is-dragging");
+    const file = [...(event.dataTransfer?.files || [])].find((item) =>
+      /\.docx$/i.test(item.name),
+    );
+    if (!file) {
+      alert("請拖入 .docx 文件；舊版 .doc 格式不受支援。");
+      return;
+    }
+    await importDocx(ch.id, "", file);
+  });
+}
+
+async function importDocx(chId, encodedParent = "", providedFile = null) {
+  const p = await getProject(true), ch = getChapter(chId);
+  if (!p || !ch) return false;
+  const file =
+    providedFile ||
+    (await pickLocalFile(
+      ".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ));
+  if (!file) return false;
+  if (!/\.docx$/i.test(file.name || "")) {
+    alert("請選擇 .docx 文件；舊版 .doc 格式不受支援。");
+    return false;
+  }
+  if (!window.DocxImporter) {
+    reportIssue("匯入 DOCX", new Error("DOCX 轉換模組未載入"));
+    return false;
+  }
+  const parent = decodeURIComponent(encodedParent || "");
+  const suggested = cleanName(file.name.replace(/\.docx$/i, "")) || "imported-document";
+  let name = prompt("匯入後的 Markdown 檔名", suggested + ".md");
+  if (!name) return false;
+  name = cleanName(name);
+  if (!/\.md$/i.test(name)) name += ".md";
+  const rel = pathJoin(parent, name), full = pathJoin(ch.folder, rel);
+  if (await existsPath(p.root, full)) {
+    alert("同名 Markdown 已存在，請換一個檔名後再匯入。");
+    return false;
+  }
+  const title = name.replace(/\.md$/i, "");
+  const imageRoot = ch.imageFolder || pathJoin("assets/images", ch.id);
+  let assetFolder = pathJoin(imageRoot, "imports", cleanName(title));
+  if (await existsPath(p.root, assetFolder, "directory"))
+    assetFolder += "-" + new Date().toISOString().replace(/\D/g, "").slice(0, 14);
+  setStatus("正在本機轉換 DOCX…");
+  try {
+    const result = await window.DocxImporter.convert(file, {
+      title,
+      assetBase: assetFolder,
+    });
+    for (const media of result.media) {
+      await writeBlob(p.root, media.path, media.blob);
+      p.manifest.imageMeta ||= {};
+      p.manifest.imageMeta[media.path] = {
+        role: "illustration",
+        caption: title + " · DOCX 匯入圖片",
+      };
+    }
+    if (result.media.length) await writeManifest(p.root, p.manifest);
+    await writeText(p.root, full, result.markdown);
+    await refreshChapterTree(ch);
+    setStatus(
+      `已匯入 ${file.name} → ${full}${result.media.length ? `，並抽取 ${result.media.length} 張圖片` : ""}`,
+    );
+    alert(
+      `DOCX 已轉成 Markdown：\n${full}` +
+        (result.media.length ? `\n已抽取 ${result.media.length} 張內嵌圖片。` : "") +
+        "\n\n複雜排版、註解、修訂記錄與頁首頁尾可能不會保留，請打開文件檢查一次。",
+    );
+    return true;
+  } catch (error) {
+    reportIssue("匯入 DOCX " + file.name, error);
+    return false;
+  }
 }
 async function replaceChapterFile(chId, encodedRel) {
   const p = await getProject(true),
@@ -1538,6 +1633,7 @@ window.BY = {
   addSeriesDoc,
   newFolder,
   newMarkdown,
+  importDocx,
   replaceChapterFile,
   deleteChapterFile,
   renameChapterFile,
