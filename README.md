@@ -12,7 +12,7 @@
 純瀏覽使用隨包示例快照；修改本地 Markdown 會在本地整理模式即時讀取。若要更新隨包示例，執行 `python build-demo.py`。此腳本會將 content 中的 Markdown 與 manifest 打包成 js/demo-data.js，分享前請確認內容均可公開。瀏覽器本身不需要安裝 Python。
 
 先從左側《五分鐘上手》開始，再進入任一示例。三組內容分別展示世界觀管理、副本資訊管理及人物關係管理；十五份 MD 均包含短例子、表格、標籤與操作提示。文件名稱、分類和內容都可自行修改。
-[畫面預覽](https://github.com/hflowerking/local-novel-project-showcase/blob/main/screenshots/three%20view.png!)
+![畫面預覽](https://github.com/hflowerking/local-novel-project-showcase/blob/main/screenshots/three%20view.png)
 | 示例 | 主要示範 | BGM |
 | --- | --- | --- |
 | 《逆爐問仙》· 修仙 | 世界觀、硬規則、角色卡、篇章因果 | 踏碎凌霄 |
@@ -20,9 +20,9 @@
 | 《春燈誤》· 耽美 | 人物關係、感情階段、事件節點、伏筆回收 | 此生足矣 |
 
 每組含封面圖與展臺圖；抬頭展示直接共用展臺圖，避免保存重複素材。圖片採用 WebP，音樂使用英文檔名，介面仍顯示繁體曲名。進入示例會預選對應 BGM，需手動按播放。示例圖片與音樂含 AI 生成內容，只用於介面展示與功能測試，公開或商業使用前請自行確認權利並優先替換。連接本地企劃後，可使用原有編輯、圖片庫、連續閱讀、全局搜索、標籤、歷史版本、垃圾桶及 ZIP 快照功能。
-
+![畫面預覽](https://github.com/hflowerking/local-novel-project-showcase/blob/main/screenshots/pic%20cut.png)
 在本地整理模式中，右下角「🎨 主題」可新增、改名或調整篇章類型的顏色，例如輕快、戀愛、熱血。進入既有篇章後點「編輯篇章」，即可更換名稱、副標題、簡介與類型。類型名稱與顏色分開保存：把「恐怖懸疑」改成藍色只會改變它的視覺；若要改成「戀愛」，請在篇章設定中更換類型。
-
+![畫面預覽](https://github.com/hflowerking/local-novel-project-showcase/blob/main/screenshots/doc.png)
 三組示例只用於教學，並非三部完整小說。
 
 ver1.2 包含：純瀏覽模式、閱讀頁 YAML 隱藏、安全刪除委託修正、運行問題提示、BGM 與類型健康檢查。所有刪除入口均使用垃圾桶；安全模組未載入時停止刪除。BGM 刪除與還原會同步篇章綁定。標籤由每份 MD 的 YAML 讀取。
