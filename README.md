@@ -1,5 +1,5 @@
 # 本地小說企劃展示與整理臺 · ver1.2
-
+https://github.com/hflowerking/local-novel-project-showcase/blob/main/screenshots/home.png
 企劃、功能方向與版本整理：百花王 康門  
 程式實作、文件整理與教學示例曾使用 OpenAI ChatGPT／Codex 協助完成，最終內容由百花王 康門選擇、修改與審訂。
 
