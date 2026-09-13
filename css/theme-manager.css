@@ -1,0 +1,70 @@
+/* Demo 1.2 · dynamic chapter themes */
+.field textarea {
+  width: 100%;
+  min-height: 82px;
+  resize: vertical;
+  background: #0c0e12;
+  border: 1px solid #343943;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font: inherit;
+  color: inherit;
+}
+
+.toolpanel.theme-manager {
+  width: min(430px, calc(100vw - 36px));
+  max-height: min(78vh, 680px);
+  overflow: auto;
+}
+
+.theme-list {
+  display: grid;
+  gap: 8px;
+}
+
+.theme-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 48px 32px;
+  gap: 8px;
+  align-items: center;
+  padding: 7px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.theme-row input[type="text"] {
+  min-width: 0;
+  background: #0b0d11;
+  border: 1px solid #343943;
+  border-radius: 9px;
+  padding: 7px 9px;
+}
+
+.theme-row input[type="color"] {
+  width: 48px;
+  height: 34px;
+  border: 0;
+  padding: 1px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.theme-row .theme-delete {
+  width: 30px;
+  height: 30px;
+  font-size: 17px;
+}
+
+.theme-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+
+.theme-manager .toolactions {
+  flex-wrap: wrap;
+}

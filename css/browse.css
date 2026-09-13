@@ -1,0 +1,14 @@
+.browse-header { width: 100%; max-height: 280px; object-fit: cover; border-radius: 18px; margin-bottom: 20px; }
+.browse-showcase { display: block; width: 100%; height: auto; object-fit: contain; }
+.browse-slides { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; }
+.browse-slides [aria-pressed="true"] { border-color: #b3b3d6; background: #ffffff18; }
+#browsePlayer { width: 100%; margin-top: 16px; }
+.compat-note { margin-top: 10px; color: #d7d7e2; font-size: .92rem; line-height: 1.6; }
+.browse-mode .treefile a { overflow-wrap: anywhere; }
+@media (max-width: 700px) {
+  .browse-mode .topin { flex-wrap: wrap; }
+  .browse-mode .brand { min-width: 0; }
+  .browse-mode .nav { flex-wrap: wrap; }
+  .browse-mode .hero-home { display: block; }
+  .browse-mode .hero-copy { margin-top: 20px; }
+}

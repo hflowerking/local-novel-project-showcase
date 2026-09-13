@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>本地小說企劃展示與整理臺 ver1.2 · 書架</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/theme-manager.css" />
+    <link rel="stylesheet" href="css/browse.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="wrap topin">
+        <div class="brand">
+          <div class="mark">文</div>
+          <div>本地小說企劃展示與整理臺 ver1.2</div>
+        </div>
+        <nav class="nav">
+          <a href="index.html">首頁</a><a href="images.html">圖片庫</a
+          ><button class="btn" onclick="BY.openDialog()">＋ 新增篇章</button
+          ><button
+            class="btn"
+            id="reconnectBtn"
+            onclick="BY.reconnect()"
+            hidden
+          >
+            恢復上次項目</button
+          ><button class="btn" onclick="BY.connect()">選擇項目資料夾</button>
+        </nav>
+      </div>
+    </header>
+    <main class="wrap">
+      <section class="hero hero-home">
+        <div class="hero-visual">
+          <div class="showcase showcase-focus" id="homeShowcase">
+            <div class="showcase-empty">正在讀取展臺圖…</div>
+          </div>
+        </div>
+        <div class="hero-copy">
+          <div class="eyebrow">Local Creative CMS</div>
+          <h1 id="projectTitle">本地小說企劃展示與整理臺</h1>
+          <div class="lead" id="projectSub">ver1.2 · 教學模板</div>
+          <div class="notice" style="margin-top: 12px">
+            狀態：<span id="projectStatus">讀取中…</span>
+          </div>
+          <div class="compat-note">
+            純瀏覽可直接使用；本地編輯與檔案管理僅支援桌面版 Chrome／Edge。
+          </div>
+          <div class="compat-note">
+            示例圖片與音樂含 AI 生成內容，僅供展示與測試；公開或商業使用前請先確認權利並建議替換。
+          </div>
+          <div class="actions">
+            <a
+              class="btn"
+              href="reader.html?file=content%2F_series%2FStart_Here.md"
+              >先看：五分鐘上手</a
+            >
+          </div>
+        </div>
+      </section>
+      <section class="section">
+        <div class="sectionhead">
+          <h2>篇章書架</h2>
+          <div class="meta">選一個示例，打開短文檔，即可了解工作臺用法。</div>
+        </div>
+        <div class="grid chapters" id="chapterGrid">
+          <div class="empty">請先選擇項目資料夾。</div>
+        </div>
+      </section>
+      <section class="section">
+        <div class="manager-note">
+          <strong>ver1.2 · 檔案管理</strong
+          ><span
+            >進入任何篇章後，可直接新增／重命名／移動／替換／刪除 Markdown
+            與子資料夾。左側說明文件也可直接替換或刪除；圖片、BGM
+            同樣支持替換與刪除。</span
+          >
+        </div>
+      </section>
+      <p class="wrap" style="opacity: 0.65; padding: 20px 0">
+        程式碼 MIT · 教學 CC BY 4.0 · AI 素材另見聲明 · ver1.2
+      </p>
+    </main>
+    <div class="dialog" id="dialog">
+      <div class="dialogbox">
+        <h2>新增篇章</h2>
+        <div class="field">
+          <label>篇章名稱</label
+          ><input id="newTitle" placeholder="例如：新篇章" />
+        </div>
+        <div class="field">
+          <label>英文 ID / 資料夾名</label
+          ><input id="newId" placeholder="例如：chapter-01" />
+        </div>
+        <div class="field">
+          <label>篇章類型</label
+          ><select id="newTheme"></select>
+        </div>
+        <div class="hint">
+          類型與顏色可在右下角「🎨
+          主題」中新增或修改。新篇章會自動建立：劇情、人物、時間點、核心規則、寫法規則、伏筆、待定項、廢案。
+        </div>
+        <div class="actions">
+          <button class="btn" onclick="BY.createChapter()">
+            建立篇章與分層</button
+          ><button class="btn" onclick="BY.closeDialog()">取消</button>
+        </div>
+      </div>
+    </div>
+    <script src="js/marked.js"></script>
+    <script src="js/jszip.min.js"></script>
+    <script src="js/markdown-utils.js"></script>
+    <script src="js/reader-navigation.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/workbench.js"></script>
+    <script src="js/demo-data.js"></script>
+    <script src="js/browse.js"></script>
+    <script>
+      BY.initHome();
+    </script>
+  </body>
+</html>

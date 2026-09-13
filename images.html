@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>本地小說企劃展示與整理臺 ver1.2 · 圖片庫</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/theme-manager.css" />
+    <link rel="stylesheet" href="css/browse.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="wrap topin">
+        <div class="brand">
+          <div class="mark">文</div>
+          <div>本地小說企劃展示與整理臺 ver1.2 · 圖片庫</div>
+        </div>
+        <nav class="nav">
+          <a href="index.html">← 返回書架</a
+          ><button class="btn" id="addImageBtn">＋ 加入圖片</button
+          ><button
+            class="btn"
+            id="reconnectBtn"
+            onclick="BY.reconnect()"
+            hidden
+          >
+            恢復上次項目</button
+          ><button class="btn" onclick="BY.connect()">重選項目</button>
+        </nav>
+      </div>
+    </header>
+    <main class="wrap">
+      <section class="hero">
+        <div class="eyebrow">Image Cabinet</div>
+        <h1 id="imagesTitle">圖片庫</h1>
+        <div class="lead">
+          點擊圖片放大；可指定封面／插圖／角色圖／參考圖，並可直接替換、改名或刪除真實圖片檔案。
+        </div>
+        <div class="notice" style="margin-top: 12px">
+          狀態：<span id="projectStatus">讀取中…</span>
+        </div>
+        <div class="compat-note">
+          隨包示例圖片含 AI 生成內容，僅供展示與測試；請勿直接視為可自由商用素材。
+        </div>
+      </section>
+      <section class="section">
+        <div class="grid images" id="imageGrid"></div>
+      </section>
+      <p class="wrap" style="opacity: 0.65; padding: 20px 0">
+        程式碼 MIT · 教學 CC BY 4.0 · AI 素材另見聲明 · ver1.2
+      </p>
+    </main>
+    <div
+      class="lightbox"
+      id="lightbox"
+      onclick="if (event.target === this) BY.closeLightbox();"
+    >
+      <div class="lightboxbox">
+        <button class="lightclose" onclick="BY.closeLightbox()">×</button
+        ><img id="lightboxImg" alt="" />
+        <div class="lightmeta">
+          <strong id="lightboxTitle"></strong>
+          <div id="lightboxCaption"></div>
+        </div>
+      </div>
+    </div>
+    <script src="js/marked.js"></script>
+    <script src="js/jszip.min.js"></script>
+    <script src="js/markdown-utils.js"></script>
+    <script src="js/reader-navigation.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/workbench.js"></script>
+    <script src="js/demo-data.js"></script>
+    <script src="js/browse.js"></script>
+    <script>
+      BY.initImages();
+    </script>
+  </body>
+</html>

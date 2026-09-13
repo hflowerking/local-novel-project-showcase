@@ -1,0 +1,133 @@
+{
+  "project": {
+    "title": "本地小說企劃展示與整理臺",
+    "subtitle": "ver1.2 · 教學模板 · 百花王 康門 開源"
+  },
+  "colors": {
+    "baizi": "#ffffff",
+    "unknown": "#050505",
+    "horror": "#b91c1c",
+    "melancholy": "#2563eb"
+  },
+  "themes": [
+    {
+      "id": "baizi",
+      "label": "中性",
+      "color": "#f4f4f5"
+    },
+    {
+      "id": "unknown",
+      "label": "未知",
+      "color": "#3f3f46"
+    },
+    {
+      "id": "horror",
+      "label": "恐怖懸疑",
+      "color": "#b91c1c"
+    },
+    {
+      "id": "melancholy",
+      "label": "憂鬱",
+      "color": "#2563eb"
+    },
+    {
+      "id": "light",
+      "label": "輕快",
+      "color": "#65a30d"
+    },
+    {
+      "id": "romance",
+      "label": "戀愛",
+      "color": "#db2777"
+    },
+    {
+      "id": "passion",
+      "label": "熱血",
+      "color": "#d97706"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "xianxia",
+      "title": "逆爐問仙",
+      "subtitle": "修仙 · 教學示例",
+      "theme": "passion",
+      "folder": "content/xianxia",
+      "imageFolder": "assets/images/xianxia",
+      "audioTrack": "assets/audio/xianxia-theme.mp3",
+      "audioTitle": "踏碎凌霄",
+      "description": "示範世界觀、硬規則、角色卡與篇章因果。"
+    },
+    {
+      "id": "infinite",
+      "title": "第七碼頭",
+      "subtitle": "無限流 · 教學示例",
+      "theme": "horror",
+      "folder": "content/infinite",
+      "imageFolder": "assets/images/infinite",
+      "audioTrack": "assets/audio/infinite-theme.mp3",
+      "audioTitle": "寒雨七號",
+      "description": "示範副本規則、線索可信度與隊伍狀態。"
+    },
+    {
+      "id": "danmei",
+      "title": "春燈誤",
+      "subtitle": "耽美 · 教學示例",
+      "theme": "romance",
+      "folder": "content/danmei",
+      "imageFolder": "assets/images/danmei",
+      "audioTrack": "assets/audio/danmei-theme.mp3",
+      "audioTitle": "此生足矣",
+      "description": "示範人物關係、感情進度、事件與伏筆回收。"
+    }
+  ],
+  "seriesDocs": [
+    {
+      "title": "五分鐘上手",
+      "path": "content/_series/Start_Here.md",
+      "group": "使用說明"
+    }
+  ],
+  "imageMeta": {
+    "assets/images/xianxia/cover.webp": {
+      "role": "cover",
+      "caption": "逆爐問仙 · 封面",
+      "variant": "cover"
+    },
+    "assets/images/xianxia/showcase.webp": {
+      "role": "showcase",
+      "caption": "逆爐問仙 · 展臺",
+      "variant": "showcase"
+    },
+    "assets/images/infinite/cover.webp": {
+      "role": "cover",
+      "caption": "第七碼頭 · 封面",
+      "variant": "cover"
+    },
+    "assets/images/infinite/showcase.webp": {
+      "role": "showcase",
+      "caption": "第七碼頭 · 展臺",
+      "variant": "showcase"
+    },
+    "assets/images/danmei/cover.webp": {
+      "role": "cover",
+      "caption": "春燈誤 · 封面",
+      "variant": "cover"
+    },
+    "assets/images/danmei/showcase.webp": {
+      "role": "showcase",
+      "caption": "春燈誤 · 展臺",
+      "variant": "showcase"
+    }
+  },
+  "audio": {
+    "folder": "assets/audio",
+    "track": "assets/audio/xianxia-theme.mp3",
+    "volume": 0.35,
+    "loop": true
+  },
+  "version": "Workbench 1.4.1",
+  "schemaVersion": 11,
+  "workbenchVersion": "1.4.1",
+  "demoVersion": "ver1.2"
+}
