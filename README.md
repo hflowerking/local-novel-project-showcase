@@ -12,7 +12,7 @@
 純瀏覽使用隨包示例快照；修改本地 Markdown 會在本地整理模式即時讀取。若要更新隨包示例，執行 `python build-demo.py`。此腳本會將 content 中的 Markdown 與 manifest 打包成 js/demo-data.js，分享前請確認內容均可公開。瀏覽器本身不需要安裝 Python。
 
 先從左側《五分鐘上手》開始，再進入任一示例。三組內容分別展示世界觀管理、副本資訊管理及人物關係管理；十五份 MD 均包含短例子、表格、標籤與操作提示。文件名稱、分類和內容都可自行修改。
-
+[畫面預覽](https://github.com/hflowerking/local-novel-project-showcase/blob/main/screenshots/three%20view.png!)
 | 示例 | 主要示範 | BGM |
 | --- | --- | --- |
 | 《逆爐問仙》· 修仙 | 世界觀、硬規則、角色卡、篇章因果 | 踏碎凌霄 |
